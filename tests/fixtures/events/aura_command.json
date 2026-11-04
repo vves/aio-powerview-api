@@ -1,0 +1,12 @@
+{
+  "err": 0,
+  "responses": [
+    {
+      "bleName": "AUR:60EC",
+      "err": 0,
+      "id": 291,
+      "hex": "e701570a0000800080e408010000"
+    }
+  ],
+  "wentViaHTTP": true
+}

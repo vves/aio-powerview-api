@@ -193,6 +193,77 @@ Shades not listed will get their features from their **capabilities**, unfortuna
 
 - Constrain aiohttp package versions.
 
+## Gen3 shade event stream prototype
+
+`aiopvapi.events.ShadeEventStream` reads
+`/home/shades/events?sse=true&raw=true` using the caller's aiohttp session.
+It yields `ShadeEvent` objects for `motion-started` and `motion-stopped`.
+`ShadeEventState` merges reported positions into `PowerviewShadeData` using
+the existing shade-specific position conversions. Targets remain separate
+from reported positions. Older events are rejected per shade; distinct
+events sharing a timestamp retain arrival order.
+
+Aura illuminated shades (capability 11, including type 96) expose `current_light` as a
+`ShadeLightState` with brightness in percent and temperature in Kelvin.
+The initial snapshot and subsequent motion events populate this state.
+Unknown light state remains `None`; brightness zero represents off.
+Events expose `current_light` and `target_light` separately, and partial
+light updates preserve omitted values and panel positions. The monitor
+prints both reported and target light state.
+
+Aura shades provide
+`set_light(brightness=..., temperature=..., rate_in_seconds=...)`.
+All three command fields are required. The command does not overwrite reported state.
+Command brightness is a fraction from 0.0 to 1.0; the captured SSE events
+report brightness on a 0–100 scale. Do not pass the reported percent directly
+to `set_light`.
+The confirmed command is `PUT /home/shades/positions?ids=<shade-id>` with
+`{"positions":{"light":{"brightness":1.0,"temperature":2700,"rateInSeconds":1}}}`.
+Hardware testing confirmed a successful response for shade 291, followed by
+SSE confirmation of its requested 2700 K state. Aura supports color temperatures from 2200 K
+to 6500 K, inclusive.
+
+With the SSE monitor running in another terminal, send a test command:
+
+```sh
+python3 -m aiopvapi.example.light powerview-g3.local 291 \
+  --brightness 1.0 --temperature 2700 --rate-in-seconds 1
+```
+
+Use `--brightness 0` with the temperature and duration to turn the light off.
+These commands change the selected light. The gateway rejected the earlier
+body without `rateInSeconds`; transition-duration limits remain unconfirmed.
+
+The initial SSE connection does not contain current state. Fetch
+`Shades.get_shades()` before opening the stream, including on reconnect.
+The gateway architect confirmed that GET returns current position and
+motion events cover all initiating systems. Snapshot responses have no
+ordering metadata. The GET-then-SSE sequence is not atomic, so this
+prototype cannot reconstruct an entire movement occurring between those
+requests. It does not assume event replay or an undocumented heartbeat.
+
+The read-only monitor fetches the initial snapshot, prints events, and
+reconnects with exponential backoff capped at 60 seconds. It sends no
+movement commands and performs no periodic polling while connected:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -e . pytest pytest-asyncio
+python3 -m aiopvapi.example.events powerview-g3.local
+```
+
+Press Ctrl+C to stop and close the connection. To run the focused tests:
+
+```sh
+python3 -m pytest -q tests/test_events.py
+```
+
+This is an unreleased library prototype. The companion Home Assistant
+PowerView changes consume this stream API and expose Aura light entities.
+Install this library branch when testing that Home Assistant branch; the
+published aiopvapi 3.4.1 package does not include these additions.
+
 ## Links
 
 ---

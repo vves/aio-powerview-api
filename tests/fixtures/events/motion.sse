@@ -1,0 +1,22 @@
+100 HELO
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T15:44:57.630Z","bleName":"PIR:CEBC","id":378,"currentPositions":{"primary":0,"secondary":0,"tilt":0},"targetPositions":{"primary":0,"secondary":0,"tilt":1,"etaInSeconds":10}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T15:45:03.373Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0,"secondary":0,"tilt":0.37},"targetPositions":{"primary":0,"secondary":0,"tilt":1,"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T15:45:04.798Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0,"secondary":0,"tilt":1}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T15:45:07.393Z","bleName":"PIR:CEBC","id":378,"currentPositions":{"primary":0,"secondary":0,"tilt":0.98}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T15:45:23.106Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0,"secondary":0,"tilt":1},"targetPositions":{"primary":0,"secondary":0,"tilt":0,"etaInSeconds":10}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T15:45:24.123Z","bleName":"PIR:CEBC","id":378,"currentPositions":{"primary":0,"secondary":0,"tilt":0.98},"targetPositions":{"primary":0,"secondary":0,"tilt":0,"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T15:45:26.110Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0,"secondary":0,"tilt":0}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T15:45:25.996Z","bleName":"PIR:CEBC","id":378,"currentPositions":{"primary":0,"secondary":0,"tilt":0}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T15:45:58.199Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0,"secondary":0,"tilt":0},"targetPositions":{"primary":0.58,"secondary":0,"tilt":0,"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T15:46:12.747Z","bleName":"PIR:9989","id":9,"currentPositions":{"primary":0.576,"secondary":0,"tilt":0}}
+

@@ -3,6 +3,7 @@
 import asyncio
 from dataclasses import dataclass
 import logging
+import math
 from typing import Any
 
 from aiopvapi.helpers.aiorequest import AioRequest, PvApiMaintenance
@@ -56,6 +57,7 @@ from aiopvapi.helpers.constants import (
     SHADE_BATTERY_STRENGTH,
 )
 from aiopvapi.helpers.tools import deep_update_dict, join_path
+from aiopvapi.resources.light import ShadeLightState
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -389,7 +391,7 @@ class BaseShade(ApiResource):
         data = self._create_shade_data(position_data=position_data)
         return await self._move(data)
 
-    async def _move(self, position_data: dict):
+    async def _move(self, position_data: dict, update_position: bool = True):
         params = {}
         resource_path = self._resource_path
         if self.api_version >= 3:
@@ -398,14 +400,17 @@ class BaseShade(ApiResource):
             resource_path = join_path(self.base_path, "positions")
         # store the requested position in the shade data
         response = await self.request.put(resource_path, data=position_data, params=params)
-        self._update_position_from_dict(position_data)
+        if update_position:
+            self._update_position_from_dict(position_data)
         return response
 
-    async def move(self, position_data: ShadePosition) -> ShadePosition:
+    async def move(
+        self, position_data: ShadePosition, *, update_position: bool = True
+    ) -> ShadePosition:
         """Move the shade to a set position."""
         _LOGGER.debug("Shade %s move to: %s", self.name, position_data)
         data = self.structured_to_raw(position_data)
-        await self._move(data)
+        await self._move(data, update_position=update_position)
         return self.current_position
 
     def get_additional_positions(self, positions: ShadePosition) -> ShadePosition:
@@ -1182,6 +1187,42 @@ class ShadeDualOverlappedIlluminated(ShadeDualOverlapped):
         ),
         "Illuminated Shades",
     )
+
+    @property
+    def current_light(self) -> ShadeLightState | None:
+        """Return reported light state, including the initial snapshot."""
+        return ShadeLightState.from_data(self._raw_data[ATTR_POSITIONS].get("light"))
+
+    async def set_light(
+        self,
+        *,
+        brightness: float,
+        temperature: int | float,
+        rate_in_seconds: int | float,
+    ) -> None:
+        """Set brightness (0–1) and Kelvin temperature over the given duration."""
+        if self.api_version != 3:
+            raise ValueError("Light control requires a Gen3 gateway")
+        if brightness is None or temperature is None:
+            raise ValueError("Brightness and temperature are required")
+        if (
+            isinstance(rate_in_seconds, bool)
+            or not isinstance(rate_in_seconds, (int, float))
+            or not math.isfinite(rate_in_seconds)
+            or rate_in_seconds < 0
+        ):
+            raise ValueError("Invalid light transition duration")
+        light = ShadeLightState(brightness, temperature).as_dict()
+        ShadeLightState.from_data(light)
+        if brightness > 1:
+            raise ValueError("Command brightness must be between 0 and 1")
+        light["brightness"] = float(brightness)
+        light["rateInSeconds"] = rate_in_seconds
+        await self.request.put(
+            join_path(self.base_path, "positions"),
+            data={ATTR_POSITIONS: {"light": light}},
+            params={"ids": self.id},
+        )
 
 
 def factory(raw_data: dict, request: AioRequest):

@@ -1,0 +1,12 @@
+data: {"evt":"motion-started","isoDate":"2026-10-26T16:34:13.726Z","bleName":"AUR:EFA9","id":281,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700}},"targetPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2200},"etaInSeconds":10}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T16:34:14.253Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700}},"targetPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2200},"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T16:34:15.712Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2200}}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T16:34:15.839Z","bleName":"AUR:EFA9","id":281,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2200}}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T16:38:30.183Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2200}},"targetPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700},"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T16:38:31.643Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700}}}
+

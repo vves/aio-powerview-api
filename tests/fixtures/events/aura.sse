@@ -1,0 +1,10 @@
+100 HELO
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T16:25:06.724Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":0,"temperature":2700}},"targetPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700},"etaInSeconds":10}}
+
+data: {"evt":"motion-started","isoDate":"2026-10-26T16:25:07.199Z","bleName":"AUR:EFA9","id":281,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":0,"temperature":2700}},"targetPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700},"etaInSeconds":10}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T16:25:08.895Z","bleName":"AUR:60EC","id":291,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700}}}
+
+data: {"evt":"motion-stopped","isoDate":"2026-10-26T16:25:08.952Z","bleName":"AUR:EFA9","id":281,"currentPositions":{"primary":0,"secondary":1,"tilt":0,"light":{"brightness":100,"temperature":2700}}}
+
