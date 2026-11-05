@@ -379,6 +379,22 @@ async def test_monitor_reconnect(
     assert output.count("shade=413 motion-stopped") == 2
 
 
+@pytest.mark.parametrize("shade_index", [80, 95, 96])
+def test_aura_shade_indexes(request_mock: Mock, shade_index: int) -> None:
+    """Recognize every Aura index without requiring capability fallback."""
+    records = json.loads((FIXTURES / "gen3/home/shades.json").read_text())
+    raw = deepcopy(records[-1])
+    raw["type"] = shade_index
+    raw.pop("capabilities")
+    raw["positions"]["light"] = {"brightness": 50, "temperature": 2700}
+
+    shade = factory(raw, request_mock)
+
+    assert isinstance(shade, ShadeDualOverlappedIlluminated)
+    assert shade.type_name == "Aura® Illuminated Shade"
+    assert shade.current_light == ShadeLightState(50, 2700)
+
+
 @pytest.fixture
 def aura_state(request_mock: Mock) -> ShadeEventState:
     """Initialize Aura shades using the existing type 95 snapshot fixture."""

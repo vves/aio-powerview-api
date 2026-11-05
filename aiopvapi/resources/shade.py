@@ -1174,7 +1174,9 @@ class ShadeDualOverlappedIlluminated(ShadeDualOverlapped):
     """
 
     shade_types = (
-        ShadeType(95, "Aura Illuminated, Roller"),  # TODO: Capabilites 11 (light)
+        ShadeType(80, "Aura® Illuminated Shade"),
+        ShadeType(95, "Aura® Illuminated Shade"),
+        ShadeType(96, "Aura® Illuminated Shade"),
     )
 
     capability = ShadeCapability(
