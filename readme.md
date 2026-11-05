@@ -302,3 +302,17 @@ unloading the gateway to cancel queued and in-flight work. Home Assistant
 enables this for Gen3 and dispatches multi-entity cover/light actions
 concurrently. Separately awaited actions do not form a batch. SSE remains the
 source of confirmed position and light state.
+
+
+## Home Assistant support registration
+
+During every Gen3 config-entry setup, including existing installs and reloads,
+Home Assistant calls `hub.register_integration("HomeAssistant")`. This sends
+`PUT /home/integration/HomeAssistant` with no request body, registering the
+support tag required for gateway REST API use. An empty HTTP 204 response is
+success for this operation; other calls retain their existing maintenance
+response handling. The exact gateway-defined
+`HomeAssistant` identifier is accepted alongside the existing third-party
+identifier naming rules. Registration failures use Home Assistant's normal
+setup retry path. Gen1 and Gen2 hubs do not receive this request, and unloading
+the integration does not remove the support tag.

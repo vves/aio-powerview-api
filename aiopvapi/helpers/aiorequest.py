@@ -238,6 +238,7 @@ class AioRequest:
         data: dict | None = None,
         params=None,
         suppress_timeout: bool = False,
+        expect_no_content: bool = False,
         **kwargs,
     ):
         """Do a put request.
@@ -249,6 +250,7 @@ class AioRequest:
         :param suppress_timeout: Stermine if timeouts will return an error
         :param kwargs: Keyword arguments to be passed to aiohttp ClientSession get method.
                     For example, timeout can be passed as kwargs.
+        :param expect_no_content: Accept HTTP 204 as success for this operation.
         :return: A dictionary representing the JSON response.
         """
         response = None
@@ -265,6 +267,9 @@ class AioRequest:
             response = await self.websession.put(
                 url, json=data, params=params, timeout=timeout, **kwargs
             )
+            if response.status == 204 and expect_no_content:
+                self._last_request_status = response.status
+                return None
             return await self.check_response(response, [200, 204])
         except TimeoutError as error:
             if suppress_timeout:

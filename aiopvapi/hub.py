@@ -153,10 +153,13 @@ class Hub(ApiBase):
     def validate_integration_name(self, name):
         """Confirm name meets hub requirements.
 
-        Unique 3rd party ASCII integration identifier that must be all lower case, can be a maximum
+        The gateway-defined HomeAssistant identifier is also supported.
+        Other 3rd party ASCII integration identifiers must be all lower case, can be a maximum
         of 12 characters in length, and must only contain the characters [a-z], [0-9], or the
         special characters '.' (dot/period), '@', '_' (underscore) and '-' (hyphen)
         """
+        if name == "HomeAssistant":
+            return True
         pattern = r"^[a-z0-9._@-]{1,12}$"
         if re.match(pattern, name):
             return True
@@ -173,7 +176,7 @@ class Hub(ApiBase):
             return
 
         url = get_base_path(self.request.hub_ip, join_path("home", "integration", name))
-        await self.request.post(url)
+        await self.request.put(url, expect_no_content=True)
 
     async def remove_integration(self, name: str) -> None:
         """Remove an integration from the Powerview Gateway."""
