@@ -153,12 +153,12 @@ class Hub(ApiBase):
     def validate_integration_name(self, name):
         """Confirm name meets hub requirements.
 
-        The gateway-defined HomeAssistant identifier is also supported.
+        The gateway-defined HA identifier is also supported.
         Other 3rd party ASCII integration identifiers must be all lower case, can be a maximum
         of 12 characters in length, and must only contain the characters [a-z], [0-9], or the
         special characters '.' (dot/period), '@', '_' (underscore) and '-' (hyphen)
         """
-        if name == "HomeAssistant":
+        if name == "HA":
             return True
         pattern = r"^[a-z0-9._@-]{1,12}$"
         if re.match(pattern, name):

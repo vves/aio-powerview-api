@@ -307,12 +307,12 @@ source of confirmed position and light state.
 ## Home Assistant support registration
 
 During every Gen3 config-entry setup, including existing installs and reloads,
-Home Assistant calls `hub.register_integration("HomeAssistant")`. This sends
-`PUT /home/integration/HomeAssistant` with no request body, registering the
+Home Assistant calls `hub.register_integration("HA")`. This sends
+`PUT /home/integration/HA` with no request body, registering the
 support tag required for gateway REST API use. An empty HTTP 204 response is
 success for this operation; other calls retain their existing maintenance
 response handling. The exact gateway-defined
-`HomeAssistant` identifier is accepted alongside the existing third-party
+`HA` identifier is accepted alongside the existing third-party
 identifier naming rules. Registration failures use Home Assistant's normal
 setup retry path. Gen1 and Gen2 hubs do not receive this request, and unloading
 the integration does not remove the support tag.

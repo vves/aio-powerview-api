@@ -26,13 +26,13 @@ async def test_register_home_assistant(status: int, body: str | None) -> None:
         return web.Response(status=status, text=body, content_type="application/json")
 
     app = web.Application()
-    app.router.add_put("/home/integration/HomeAssistant", register)
+    app.router.add_put("/home/integration/HA", register)
     async with TestServer(app) as server, aiohttp.ClientSession() as session:
         request = AioRequest(
             str(server.make_url("/")), websession=session, api_version=3
         )
-        await Hub(request).register_integration("HomeAssistant")
-    assert calls == [("/home/integration/HomeAssistant", b"")]
+        await Hub(request).register_integration("HA")
+    assert calls == [("/home/integration/HA", b"")]
 
 
 @pytest.mark.asyncio
@@ -47,13 +47,13 @@ async def test_registration_failure(status: int, error: type[Exception]) -> None
         return web.Response(status=status)
 
     app = web.Application()
-    app.router.add_put("/home/integration/HomeAssistant", register)
+    app.router.add_put("/home/integration/HA", register)
     async with TestServer(app) as server, aiohttp.ClientSession() as session:
         request = AioRequest(
             str(server.make_url("/")), websession=session, api_version=3
         )
         with pytest.raises(error):
-            await Hub(request).register_integration("HomeAssistant")
+            await Hub(request).register_integration("HA")
 
 
 @pytest.mark.asyncio
@@ -62,7 +62,7 @@ async def test_legacy_registration(version: int) -> None:
     """Legacy hubs do not support gateway registration."""
     request = AioRequest("127.0.0.1", websession=MagicMock(), api_version=version)
     request.put = AsyncMock()
-    await Hub(request).register_integration("HomeAssistant")
+    await Hub(request).register_integration("HA")
     request.put.assert_not_awaited()
 
 
