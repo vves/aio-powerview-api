@@ -11,6 +11,16 @@ Links
 - https://home-assistant.io/
 - https://www.hunterdouglas.com/operating-systems/powerview-motorization
 
+Aura lighting (this branch)
+---------------------------
+
+Shade indexes 80, 95, and 96 are identified as Aura® Illuminated Shade
+(capability 11). Gen3 light control supports brightness (command: 0–1;
+reported state: 0–100) and 2200–6500 K color temperature. Commands require
+brightness, temperature, and rate_in_seconds; brightness-only changes must
+supply the current temperature. See `readme.md <readme.md#aura-lighting>`_
+for command examples and SSE state handling. These additions are unreleased.
+
 Changelog
 ---------
 
@@ -51,7 +61,7 @@ Changelog
 - Handle kwargs in websessions for management of timeout internally
 - Update error handling in tools
 - Handle empty values and zeros better
-- Add type 53 (Sonnette) and type 95 (Aura Illuminated, Roller). Note: *Type 95 do not support light control*
+- Add type 53 (Sonnette) and type 95 (Aura Illuminated, Roller). Light control was not available in this release; see above for current support.
 - Handle PowerType 11 + 12. Both are fixed and cannot be edited
 
 **v3.0.2**

@@ -27,7 +27,7 @@ Have a look at the examples folder for some guidance how to use it.
 | Dual Shade Overlapped Tilt 90°        |     10       |    X    |     X     | 180° | Closed        |          |     X     |
 | Dual Shade Overlapped Illuminated     |     11^      |    X    |     X     |      |               |          |     X     |
 
-\^ Capability 11 shades have the same functionality as capability 8 shades, plus an inbuild light. Light management not available via aiopvapi at this time
+\^ Capability 11 shades have the same panel functionality as capability 8 shades, plus an integrated light. Gen3 Aura light control and reported state are supported; see [Aura lighting](#aura-lighting).
 
 ## Shades
 
@@ -38,7 +38,9 @@ Shades not listed will get their features from their **capabilities**, unfortuna
 | Name                                  | Type | Capability |
 | :------------------------------------ | :--: | :--------: |
 | AC Roller                             |  49  |      0     |
-| Aura Illuminated, Roller              |  49  |     11     |
+| Aura® Illuminated Shade               |  80  |     11     |
+| Aura® Illuminated Shade               |  95  |     11     |
+| Aura® Illuminated Shade               |  96  |     11     |
 | Banded Shades                         |  52  |      0     |
 | Bottom Up                             |   5  |      0     |
 | Carole Roman Shades                   |  57  |      0     |
@@ -127,7 +129,7 @@ Shades not listed will get their features from their **capabilities**, unfortuna
 - Handle kwargs in websessions for management of timeout internally
 - Update error handling in tools
 - Handle empty values and zeros better
-- Add type 53 (Sonnette) and type 95 (Aura Illuminated, Roller). Note: *Type 95 do not support light control*
+- Add type 53 (Sonnette) and type 95 (Aura Illuminated, Roller). Light control was not available in this release; see [Aura lighting](#aura-lighting) for current support.
 - Handle PowerType 11 + 12. Both are fixed and cannot be edited
 
 ### v3.0.2
@@ -203,7 +205,9 @@ the existing shade-specific position conversions. Targets remain separate
 from reported positions. Older events are rejected per shade; distinct
 events sharing a timestamp retain arrival order.
 
-Aura illuminated shades (capability 11, including type 96) expose `current_light` as a
+### Aura lighting
+
+Aura® Illuminated Shade indexes 80, 95, and 96 (capability 11) expose `current_light` as a
 `ShadeLightState` with brightness in percent and temperature in Kelvin.
 The initial snapshot and subsequent motion events populate this state.
 Unknown light state remains `None`; brightness zero represents off.
@@ -213,7 +217,10 @@ prints both reported and target light state.
 
 Aura shades provide
 `set_light(brightness=..., temperature=..., rate_in_seconds=...)`.
-All three command fields are required. The command does not overwrite reported state.
+All three command fields are required. For a brightness-only change, supply the
+current reported temperature. For a temperature-only change, supply the current
+reported brightness divided by 100. Light commands leave panel positions
+unchanged and do not overwrite reported state.
 Command brightness is a fraction from 0.0 to 1.0; the captured SSE events
 report brightness on a 0–100 scale. Do not pass the reported percent directly
 to `set_light`.
