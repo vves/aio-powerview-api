@@ -2,8 +2,12 @@
 
 import asyncio
 import logging
+from typing import TYPE_CHECKING
 
 import aiohttp
+
+if TYPE_CHECKING:
+    from aiopvapi.helpers.position_batcher import PositionBatcher
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +30,10 @@ class PvApiConnectionError(PvApiError):
 
 class PvApiEmptyData(PvApiError):
     """PowerView Hub returned empty data."""
+
+
+class PvApiCommandError(PvApiError):
+    """A gateway rejected a position command for a shade."""
 
 
 class AioRequest:
@@ -52,6 +60,7 @@ class AioRequest:
             self.websession = aiohttp.ClientSession(loop=self.loop)
         self.api_version: int | None = api_version
         self._last_request_status: int = 0
+        self._position_batcher: PositionBatcher | None = None
         _LOGGER.debug("Powerview api version: %s", self.api_version)
 
     @property
@@ -181,7 +190,49 @@ class AioRequest:
             if response is not None:
                 await response.release()
 
+    def enable_position_batching(self, lock: asyncio.Lock | None = None) -> None:
+        """Coalesce simultaneous Gen3 position writes using a shared gateway lock."""
+        if self.api_version != 3:
+            raise ValueError("Position batching requires a Gen3 gateway")
+        if self._position_batcher is None:
+            from aiopvapi.helpers.position_batcher import PositionBatcher
+
+            self._position_batcher = PositionBatcher(self._put, lock)
+
+    def disable_position_batching(self) -> None:
+        """Release queued writes when the gateway connection is unloaded."""
+        if self._position_batcher is not None:
+            self._position_batcher.close()
+            self._position_batcher = None
+
     async def put(
+        self,
+        url: str,
+        data: dict | None = None,
+        params=None,
+        suppress_timeout: bool = False,
+        **kwargs,
+    ):
+        """Queue compatible shade commands, or send other writes directly."""
+        if (
+            self._position_batcher is not None
+            and isinstance(params, dict)
+            and set(params) == {"ids"}
+            and isinstance(params["ids"], int)
+            and url.endswith(("/home/shades/positions", "/home/shades/stop"))
+        ):
+            return await self._position_batcher.submit(
+                url,
+                params["ids"],
+                data,
+                {"suppress_timeout": suppress_timeout, **kwargs},
+                combine=url.endswith("/positions"),
+            )
+        return await self._put(
+            url, data=data, params=params, suppress_timeout=suppress_timeout, **kwargs
+        )
+
+    async def _put(
         self,
         url: str,
         data: dict | None = None,

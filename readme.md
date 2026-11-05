@@ -270,3 +270,35 @@ published aiopvapi 3.4.1 package does not include these additions.
 
 - https://home-assistant.io/
 - https://www.hunterdouglas.com/operating-systems/powerview-motorization
+
+
+## Gen3 grouped position commands
+
+Call `request.enable_position_batching()` on the shared Gen3 `AioRequest`
+instance to combine concurrent shade position commands. Commands submitted in
+one event-loop turn with compatible payloads are sent as one
+`PUT /home/shades/positions?ids=1,2,3`. Position, tilt, and Aura light commands
+use the existing shade methods and their normal unit conversions.
+
+Primary and secondary positions and Aura brightness are compared as whole
+percentages, discarding the fractional percentage. Values at most one
+percentage point apart can share a request (for example, 50.2% and 51%). Every
+pair of targets in a batch must satisfy this limit; 50%, 51%, and 52% cannot
+all share one request. The first command's original values are sent for the
+whole batch. Tilt, color temperature, transition time, other fields, and the
+set of fields supplied must match exactly. Different commands for the same
+shade retain their order, even when within the percentage tolerance.
+
+Other payload differences stay separate, including Aura brightness commands
+that preserve different color temperatures. Each caller receives its
+own shade result; a per-shade gateway error raises `PvApiCommandError` for that
+caller. Commands for the same shade retain their order. Stop commands form an
+ordering barrier and are sent individually.
+
+Batching is scoped to one request instance and is disabled by default. An
+optional `asyncio.Lock` passed to `enable_position_batching(lock)` coordinates
+writes with other radio operations. Call `disable_position_batching()` when
+unloading the gateway to cancel queued and in-flight work. Home Assistant
+enables this for Gen3 and dispatches multi-entity cover/light actions
+concurrently. Separately awaited actions do not form a batch. SSE remains the
+source of confirmed position and light state.
